@@ -20,3 +20,11 @@
 @interface TZCollectionView : UICollectionView
 
 @end
+
+@interface TZphotoPickerTitleView : UIView
+
+@property (nonatomic,strong) UIButton *button;
+
+- (void)updateTitle:(NSString *)title;
+
+@end

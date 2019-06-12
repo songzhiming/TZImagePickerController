@@ -67,3 +67,11 @@
 @interface TZGifPreviewCell : TZAssetPreviewCell
 @property (strong, nonatomic) TZPhotoPreviewView *previewView;
 @end
+
+@interface TZPhotoBottomCollectionViewCell : UICollectionViewCell
+
+@property (nonatomic, strong) TZAssetModel *model;
+@property (nonatomic,strong) UIImageView *imageView;
+@property (nonatomic, copy) NSString *representedAssetIdentifier;
+@property (nonatomic, assign) int32_t imageRequestID;
+@end

@@ -262,10 +262,10 @@
 #pragma mark - 五类个性化设置，这些参数都可以不传，此时会走默认设置
     imagePickerVc.isSelectOriginalPhoto = _isSelectOriginalPhoto;
     
-    if (self.maxCountTF.text.integerValue > 1) {
-        // 1.设置目前已经选中的图片数组
-        imagePickerVc.selectedAssets = _selectedAssets; // 目前已经选中的图片数组
-    }
+//    if (self.maxCountTF.text.integerValue > 1) {
+//        // 1.设置目前已经选中的图片数组
+//        imagePickerVc.selectedAssets = _selectedAssets; // 目前已经选中的图片数组
+//    }
     imagePickerVc.allowTakePicture = self.showTakePhotoBtnSwitch.isOn; // 在内部显示拍照按钮
     imagePickerVc.allowTakeVideo = self.showTakeVideoBtnSwitch.isOn;   // 在内部显示拍视频按
     imagePickerVc.videoMaximumDuration = 10; // 视频最大拍摄时间
@@ -285,7 +285,7 @@
     imagePickerVc.showPhotoCannotSelectLayer = YES;
     imagePickerVc.cannotSelectLayerColor = [[UIColor whiteColor] colorWithAlphaComponent:0.8];
     [imagePickerVc setPhotoPickerPageUIConfigBlock:^(UICollectionView *collectionView, UIView *bottomToolBar, UIButton *previewButton, UIButton *originalPhotoButton, UILabel *originalPhotoLabel, UIButton *doneButton, UIImageView *numberImageView, UILabel *numberLabel, UIView *divideLine) {
-        [doneButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+//        [doneButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
     }];
     /*
     [imagePickerVc setAssetCellDidSetModelBlock:^(TZAssetCell *cell, UIImageView *imageView, UIImageView *selectImageView, UILabel *indexLabel, UIView *bottomView, UILabel *timeLength, UIImageView *videoImgView) {

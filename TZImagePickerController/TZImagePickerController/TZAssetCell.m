@@ -292,13 +292,21 @@
 - (UILabel *)indexLabel {
     if (_indexLabel == nil) {
         UILabel *indexLabel = [[UILabel alloc] init];
-        indexLabel.font = [UIFont systemFontOfSize:14];
+        indexLabel.font = [self fontWithPingFangName:@"PingFangSC-Medium" size:16];
         indexLabel.textColor = [UIColor whiteColor];
         indexLabel.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:indexLabel];
         _indexLabel = indexLabel;
     }
     return _indexLabel;
+}
+
+- (UIFont *)fontWithPingFangName:(NSString *)name size:(CGFloat)size {
+    UIFont *font = [UIFont fontWithName:name size:size]; // iOS9之后出现
+    if (!font) {
+        font = [UIFont systemFontOfSize:size];
+    }
+    return font;
 }
 
 - (TZProgressView *)progressView {
@@ -364,15 +372,21 @@
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return self;
+}
+
+- (UIFont *)fontWithPingFangName:(NSString *)name size:(CGFloat)size {
+    UIFont *font = [UIFont fontWithName:name size:size]; // iOS9之后出现
+    if (!font) {
+        font = [UIFont systemFontOfSize:size];
+    }
+    return font;
 }
 
 - (void)setModel:(TZAlbumModel *)model {
     _model = model;
-    
-    NSMutableAttributedString *nameString = [[NSMutableAttributedString alloc] initWithString:model.name attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:[UIColor blackColor]}];
-    NSAttributedString *countString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"  (%zd)",model.count] attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:[UIColor lightGrayColor]}];
+    NSMutableAttributedString *nameString = [[NSMutableAttributedString alloc] initWithString:model.name attributes:@{NSFontAttributeName:[self fontWithPingFangName:@"PingFangSC-Regular" size:14.0],NSForegroundColorAttributeName:[UIColor colorWithRed:30/255.0 green:30/255.0 blue:30/255.0 alpha:1]}];
+    NSAttributedString *countString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%zd)",model.count] attributes:@{NSFontAttributeName:[self fontWithPingFangName:@"PingFangSC-Regular" size:14.0],NSForegroundColorAttributeName:[UIColor colorWithRed:130/255.0 green:130/255.0 blue:130/255.0 alpha:1]}];
     [nameString appendAttributedString:countString];
     self.titleLabel.attributedText = nameString;
     [[TZImageManager manager] getPostImageWithAlbumModel:model completion:^(UIImage *postImage) {
@@ -394,12 +408,13 @@
     [super layoutSubviews];
     _selectedCountButton.frame = CGRectMake(self.contentView.tz_width - 24, 23, 24, 24);
     NSInteger titleHeight = ceil(self.titleLabel.font.lineHeight);
-    self.titleLabel.frame = CGRectMake(80, (self.tz_height - titleHeight) / 2, self.tz_width - 80 - 50, titleHeight);
-    self.posterImageView.frame = CGRectMake(0, 0, 70, 70);
+    self.titleLabel.frame = CGRectMake(74, (self.tz_height - titleHeight) / 2, self.tz_width - 80 - 50, titleHeight);
+    self.posterImageView.frame = CGRectMake(15, 11, 48, 48);
     
     if (self.albumCellDidLayoutSubviewsBlock) {
         self.albumCellDidLayoutSubviewsBlock(self, _posterImageView, _titleLabel);
     }
+    self.albumSelectImageView.frame = CGRectMake(self.tz_width - 16 - 15, self.tz_height/2.0 - 16/2.0, 16, 16);
 }
 
 - (void)layoutSublayersOfLayer:(CALayer *)layer {
@@ -407,6 +422,16 @@
 }
 
 #pragma mark - Lazy load
+- (UIImageView *)albumSelectImageView{
+    if (!_albumSelectImageView) {
+        _albumSelectImageView = [[UIImageView alloc]init];
+        _albumSelectImageView.image = [UIImage tz_imageNamedFromMyBundle:@"album_selectImage"];
+        [self.contentView addSubview:_albumSelectImageView];
+        _albumSelectImageView.hidden = YES;
+    }
+    return _albumSelectImageView;
+}
+
 
 - (UIImageView *)posterImageView {
     if (_posterImageView == nil) {

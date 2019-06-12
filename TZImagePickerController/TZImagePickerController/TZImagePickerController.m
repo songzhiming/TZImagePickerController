@@ -59,7 +59,7 @@
     self.oKButtonTitleColorNormal   = [UIColor colorWithRed:(83/255.0) green:(179/255.0) blue:(17/255.0) alpha:1.0];
     self.oKButtonTitleColorDisabled = [UIColor colorWithRed:(83/255.0) green:(179/255.0) blue:(17/255.0) alpha:0.5];
     
-    self.navigationBar.barTintColor = [UIColor colorWithRed:(34/255.0) green:(34/255.0)  blue:(34/255.0) alpha:1.0];
+    self.navigationBar.barTintColor = [UIColor colorWithRed:(248/255.0) green:(248/255.0)  blue:(248/255.0) alpha:1.0];
     self.navigationBar.tintColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
     if (self.needShowStatusBar) [UIApplication sharedApplication].statusBarHidden = NO;
@@ -150,7 +150,7 @@
 
 - (instancetype)initWithMaxImagesCount:(NSInteger)maxImagesCount columnNumber:(NSInteger)columnNumber delegate:(id<TZImagePickerControllerDelegate>)delegate pushPhotoPickerVc:(BOOL)pushPhotoPickerVc {
     _pushPhotoPickerVc = pushPhotoPickerVc;
-    TZAlbumPickerController *albumPickerVc = [[TZAlbumPickerController alloc] init];
+    TZPhotoPickerController *albumPickerVc = [[TZPhotoPickerController alloc] init];
     albumPickerVc.isFirstAppear = YES;
     albumPickerVc.columnNumber = columnNumber;
     self = [super initWithRootViewController:albumPickerVc];
@@ -171,35 +171,35 @@
         self.autoDismiss = YES;
         self.columnNumber = columnNumber;
         [self configDefaultSetting];
-        
-        if (![[TZImageManager manager] authorizationStatusAuthorized]) {
-            _tipLabel = [[UILabel alloc] init];
-            _tipLabel.frame = CGRectMake(8, 120, self.view.tz_width - 16, 60);
-            _tipLabel.textAlignment = NSTextAlignmentCenter;
-            _tipLabel.numberOfLines = 0;
-            _tipLabel.font = [UIFont systemFontOfSize:16];
-            _tipLabel.textColor = [UIColor blackColor];
-            
-            NSDictionary *infoDict = [TZCommonTools tz_getInfoDictionary];
-            NSString *appName = [infoDict valueForKey:@"CFBundleDisplayName"];
-            if (!appName) appName = [infoDict valueForKey:@"CFBundleName"];
-            NSString *tipText = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Allow %@ to access your album in \"Settings -> Privacy -> Photos\""],appName];
-            _tipLabel.text = tipText;
-            [self.view addSubview:_tipLabel];
-            
-            _settingBtn = [UIButton buttonWithType:UIButtonTypeSystem];
-            [_settingBtn setTitle:self.settingBtnTitleStr forState:UIControlStateNormal];
-            _settingBtn.frame = CGRectMake(0, 180, self.view.tz_width, 44);
-            _settingBtn.titleLabel.font = [UIFont systemFontOfSize:18];
-            [_settingBtn addTarget:self action:@selector(settingBtnClick) forControlEvents:UIControlEventTouchUpInside];
-            [self.view addSubview:_settingBtn];
-            
-            if ([PHPhotoLibrary authorizationStatus] == 0) {
-                _timer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(observeAuthrizationStatusChange) userInfo:nil repeats:NO];
-            }
-        } else {
-            [self pushPhotoPickerVc];
-        }
+        [[TZImageManager manager] getCameraRollAlbum:self.allowPickingVideo allowPickingImage:self.allowPickingImage needFetchAssets:NO completion:^(TZAlbumModel *model) {
+            albumPickerVc.model = model;
+            self->_didPushPhotoPickerVc = YES;
+        }];
+//        if (![[TZImageManager manager] authorizationStatusAuthorized]) {
+//            _tipLabel = [[UILabel alloc] init];
+//            _tipLabel.frame = CGRectMake(8, 120, self.view.tz_width - 16, 60);
+//            _tipLabel.textAlignment = NSTextAlignmentCenter;
+//            _tipLabel.numberOfLines = 0;
+//            _tipLabel.font = [UIFont systemFontOfSize:16];
+//            _tipLabel.textColor = [UIColor blackColor];
+//
+//            NSDictionary *infoDict = [TZCommonTools tz_getInfoDictionary];
+//            NSString *appName = [infoDict valueForKey:@"CFBundleDisplayName"];
+//            if (!appName) appName = [infoDict valueForKey:@"CFBundleName"];
+//            NSString *tipText = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Allow %@ to access your album in \"Settings -> Privacy -> Photos\""],appName];
+//            _tipLabel.text = tipText;
+//            [self.view addSubview:_tipLabel];
+//
+//            _settingBtn = [UIButton buttonWithType:UIButtonTypeSystem];
+//            [_settingBtn setTitle:self.settingBtnTitleStr forState:UIControlStateNormal];
+//            _settingBtn.frame = CGRectMake(0, 180, self.view.tz_width, 44);
+//            _settingBtn.titleLabel.font = [UIFont systemFontOfSize:18];
+//            [_settingBtn addTarget:self action:@selector(settingBtnClick) forControlEvents:UIControlEventTouchUpInside];
+//            [self.view addSubview:_settingBtn];
+//            if ([PHPhotoLibrary authorizationStatus] == 0) {
+//                _timer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(observeAuthrizationStatusChange) userInfo:nil repeats:NO];
+//            }
+//        }
     }
     return self;
 }
@@ -283,7 +283,7 @@
     self.takePictureImageName = @"takePicture80";
     self.photoSelImageName = @"photo_sel_photoPickerVc";
     self.photoDefImageName = @"photo_def_photoPickerVc";
-    self.photoNumberIconImage = [self createImageWithColor:nil size:CGSizeMake(24, 24) radius:12]; // @"photo_number_icon";
+    self.photoNumberIconImage = [UIImage tz_imageNamedFromMyBundle:@"photo_number_icon"];
     self.photoPreviewOriginDefImageName = @"preview_original_def";
     self.photoOriginDefImageName = @"photo_original_def";
     self.photoOriginSelImageName = @"photo_original_sel";
@@ -341,7 +341,7 @@
 - (void)setShowSelectedIndex:(BOOL)showSelectedIndex {
     _showSelectedIndex = showSelectedIndex;
     if (showSelectedIndex) {
-        self.photoSelImage = [self createImageWithColor:nil size:CGSizeMake(24, 24) radius:12];
+        self.photoSelImage = [UIImage tz_imageNamedFromMyBundle:@"photo_number_icon"];
     }
     [TZImagePickerConfig sharedInstance].showSelectedIndex = showSelectedIndex;
 }
@@ -671,6 +671,8 @@
     }
 }
 
+
+
 - (void)callDelegateMethod {
     if ([self.pickerDelegate respondsToSelector:@selector(tz_imagePickerControllerDidCancel:)]) {
         [self.pickerDelegate tz_imagePickerControllerDidCancel:self];
@@ -763,11 +765,7 @@
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    TZImagePickerController *tzImagePicker = (TZImagePickerController *)self.navigationController;
-    if (tzImagePicker && [tzImagePicker isKindOfClass:[TZImagePickerController class]]) {
-        return tzImagePicker.statusBarStyle;
-    }
-    return [super preferredStatusBarStyle];
+    return UIStatusBarStyleDefault;
 }
 
 #pragma mark - Layout
